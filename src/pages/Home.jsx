@@ -2,20 +2,34 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePlayer } from "@/lib/playerContext";
 import { useUpload } from "@/lib/uploadContext";
-import FeedItem from "@/components/FeedItem";
-import { Plus, Loader2, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Image } from "@/components/ui/image";
+import CarouselRow from "@/components/CarouselRow";
+import { Loader2, Play, Pause, ListMusic } from "lucide-react";
+
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 18) return "Good afternoon";
+  return "Good evening";
+}
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
+  const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { playTrack } = usePlayer();
-  const { openUpload, refreshKey } = useUpload();
+  const { playTrack, current, isPlaying, togglePlay } = usePlayer();
+  const { refreshKey } = useUpload();
 
   const load = async () => {
     setLoading(true);
     try {
-      const { items } = await base44.entities.Post.filter({}, { sort: "-created_date", limit: 50 });
-      setPosts(items);
+      const [postRes, plRes] = await Promise.all([
+        base44.entities.Post.filter({}, { sort: "-created_date", limit: 50 }),
+        base44.entities.Playlist.filter({}, { sort: "-created_date", limit: 20 }),
+      ]);
+      setPosts(postRes.items || []);
+      setPlaylists(plRes.items || []);
     } finally {
       setLoading(false);
     }
@@ -23,50 +37,78 @@ export default function Home() {
 
   useEffect(() => { load(); }, [refreshKey]);
 
-  const songs = posts.filter((p) => p.type === "song" && p.audio_url);
-  const handlePlay = (post) => playTrack(post, songs);
+  const songs = posts.filter((p) => p.audio_url);
+  const trending = [...posts].sort((a, b) => (b.plays || 0) - (a.plays || 0)).slice(0, 20);
+  const recent = posts.slice(0, 6);
+  const fresh = posts.slice(0, 20);
+
+  const playPost = (post) => {
+    if (current?.id === post.id) togglePlay();
+    else playTrack(post, songs);
+  };
+
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-pink-400" /></div>;
 
   return (
-    <div className="space-y-6">
-      {/* hero + upload */}
-      <section className="glass rounded-3xl p-6 text-center relative overflow-hidden">
-        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-pink-300/40 blur-2xl" />
-        <div className="relative">
-          <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">
-            <span className="text-gradient-pink">Share your sound.</span>
-          </h1>
-          <p className="text-pink-600/70 mt-1 mb-5">Songs, snaps, and voice notes from your friends.</p>
-          <button
-            onClick={openUpload}
-            className="strawberry-gradient text-white rounded-full px-7 py-3.5 font-semibold text-lg shadow-lg shadow-pink-300/40 hover:opacity-90 active:scale-95 transition-all inline-flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" /> Upload
-          </button>
-        </div>
-      </section>
+    <div className="space-y-7">
+      <header className="flex items-center justify-between">
+        <h1 className="font-display text-2xl font-bold text-gradient-pink">{greeting()}</h1>
+        <Link to="/profile" className="w-9 h-9 rounded-full glass-pink flex items-center justify-center text-pink-600 font-bold text-sm">S</Link>
+      </header>
 
-      {/* feed */}
-      <section>
-        <div className="flex items-center gap-2 mb-4 px-1">
-          <Sparkles className="w-5 h-5 text-pink-500" />
-          <h2 className="font-display text-xl font-bold text-foreground">Fresh feed</h2>
+      {recent.length > 0 && (
+        <div className="grid grid-cols-2 gap-2.5">
+          {recent.map((p) => {
+            const cover = p.cover_image_url || p.image_url;
+            const isCurrent = current?.id === p.id;
+            const hasAudio = !!p.audio_url;
+            return (
+              <button
+                key={p.id}
+                onClick={() => hasAudio && playPost(p)}
+                className="glass rounded-xl overflow-hidden flex items-center gap-3 pr-2 text-left hover:bg-white/70 transition-colors"
+              >
+                <div className="w-12 h-12 shrink-0 bg-pink-100">
+                  {cover ? <Image src={cover} alt={p.title || ""} className="w-full h-full object-cover" fittingType="fill" /> : <div className="w-full h-full strawberry-gradient" />}
+                </div>
+                <span className="text-xs font-semibold truncate flex-1 leading-tight">{p.title || p.caption || p.type}</span>
+                {hasAudio && (
+                  <span className="w-8 h-8 rounded-full strawberry-gradient text-white flex items-center justify-center shrink-0">
+                    {isCurrent && isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
+      )}
 
-        {loading ? (
-          <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-pink-400" /></div>
-        ) : posts.length === 0 ? (
-          <div className="glass-pink rounded-3xl p-10 text-center text-pink-600/70">
-            <div className="text-5xl mb-3">🍓</div>
-            <p className="font-medium">Nothing here yet. Be the first to share!</p>
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 gap-4">
-            {posts.map((p) => (
-              <FeedItem key={p.id} post={p} queue={songs} />
+      <CarouselRow title="Fresh uploads" items={fresh} queue={songs} />
+      <CarouselRow title="Trending now" items={trending} queue={songs} />
+
+      {playlists.length > 0 && (
+        <section>
+          <h2 className="font-display text-lg font-bold text-foreground mb-3 px-1">Your playlists</h2>
+          <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+            {playlists.map((pl) => (
+              <Link key={pl.id} to={`/playlist/${pl.id}`} className="w-40 shrink-0 group">
+                <div className="aspect-square rounded-2xl overflow-hidden mb-2 strawberry-gradient flex items-center justify-center shadow-md shadow-pink-200/40">
+                  {pl.cover_image_url ? <Image src={pl.cover_image_url} alt={pl.title} className="w-full h-full object-cover" fittingType="fill" /> : <ListMusic className="w-10 h-10 text-white" />}
+                </div>
+                <p className="font-semibold text-sm truncate">{pl.title}</p>
+                <p className="text-xs text-pink-500/70">{(pl.track_ids || []).length} songs</p>
+              </Link>
             ))}
           </div>
-        )}
-      </section>
+        </section>
+      )}
+
+      {posts.length === 0 && (
+        <div className="glass-pink rounded-3xl p-10 text-center text-pink-600/70">
+          <div className="text-5xl mb-3">🍓</div>
+          <p className="font-medium">Nothing here yet. Tap upload to share your first sound or snap!</p>
+        </div>
+      )}
     </div>
   );
 }

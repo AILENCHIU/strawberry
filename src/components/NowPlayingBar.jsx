@@ -18,7 +18,7 @@ export default function NowPlayingBar() {
   const pct = duration ? (progress / duration) * 100 : 0;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-4">
+    <div className="fixed bottom-[78px] left-0 right-0 z-30 px-4">
       <div className="max-w-3xl mx-auto glass rounded-3xl px-3 py-2.5 flex items-center gap-3">
         <div className="w-12 h-12 rounded-xl overflow-hidden bg-pink-100 shrink-0">
           {current.cover_image_url || current.image_url ? (

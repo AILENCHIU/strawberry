@@ -11,7 +11,9 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { PlayerProvider } from '@/lib/playerContext';
 import Layout from '@/components/Layout';
 import Home from '@/pages/Home';
-import Playlists from '@/pages/Playlists';
+import Search from '@/pages/Search';
+import Library from '@/pages/Library';
+import PlaylistDetail from '@/pages/PlaylistDetail';
 import Profile from '@/pages/Profile';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
@@ -47,7 +49,9 @@ const AuthenticatedApp = () => {
         <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/playlists" element={<Playlists />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/library" element={<Library />} />
+            <Route path="/playlist/:id" element={<PlaylistDetail />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
         </Route>

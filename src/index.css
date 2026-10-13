@@ -119,3 +119,6 @@ html {
   background: hsl(330 60% 85%);
   border-radius: 999px;
 }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
