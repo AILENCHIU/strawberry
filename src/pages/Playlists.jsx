@@ -161,7 +161,7 @@ export default function Playlists() {
       {playlists.length === 0 ? (
         <div className="glass-pink rounded-3xl p-10 text-center text-pink-600/70">
           <ListMusic className="w-10 h-10 mx-auto mb-3 text-pink-400" />
-          <p className="font-medium">No playlists yet. Create one and shuffle through it in the car!</p>
+          <p className="font-medium">No playlists yet. Create one and shuffle through it!</p>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 gap-4">

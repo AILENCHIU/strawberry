@@ -15,7 +15,6 @@ export function PlayerProvider({ children }) {
   const [shuffle, setShuffle] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [carMode, setCarMode] = useState(false);
 
   const queueRef = useRef([]);
   const indexRef = useRef(-1);
@@ -101,8 +100,8 @@ export function PlayerProvider({ children }) {
   }, [next]);
 
   const value = {
-    current, queue, index, isPlaying, shuffle, progress, duration, carMode,
-    playTrack, togglePlay, next, prev, seek, setShuffle, setCarMode,
+    current, queue, index, isPlaying, shuffle, progress, duration,
+    playTrack, togglePlay, next, prev, seek, setShuffle,
   };
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;
