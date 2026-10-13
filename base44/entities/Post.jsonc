@@ -42,6 +42,12 @@
     },
     "author_name": {
       "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

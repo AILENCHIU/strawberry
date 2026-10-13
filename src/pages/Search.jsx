@@ -43,7 +43,7 @@ export default function Search() {
   const voice = posts.filter((p) => p.type === "voice" && p.audio_url);
 
   const ql = q.toLowerCase();
-  const matchPost = (p) => !q || (p.title || "").toLowerCase().includes(ql) || (p.author_name || "").toLowerCase().includes(ql) || (p.caption || "").toLowerCase().includes(ql);
+  const matchPost = (p) => !q || (p.title || "").toLowerCase().includes(ql) || (p.author_name || "").toLowerCase().includes(ql) || (p.caption || "").toLowerCase().includes(ql) || (p.tags || []).some((t) => String(t).toLowerCase().includes(ql));
   const matchPl = (p) => !q || (p.title || "").toLowerCase().includes(ql) || (p.description || "").toLowerCase().includes(ql);
 
   let rSongs = songs.filter(matchPost);

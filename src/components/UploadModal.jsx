@@ -109,9 +109,18 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
       }
       let image_url = "";
       let cover_image_url = "";
+      let tags = [];
       if (type === "photo" && imageFile) {
         const res = await base44.integrations.Core.UploadPublicFile({ file: imageFile });
         image_url = res.file_url;
+        try {
+          const tagRes = await base44.integrations.Core.InvokeLLM({
+            prompt: "Analyze this image and return 8-12 concise descriptive search tags that capture what's visible: objects, scene, setting, mood, colors, activities, and notable details. Use lowercase single words or short phrases. Return only the tags array.",
+            file_urls: [image_url],
+            response_json_schema: { type: "object", properties: { tags: { type: "array", items: { type: "string" } } }, required: ["tags"] },
+          });
+          tags = (tagRes.tags || []).map((t) => String(t).toLowerCase().trim()).filter(Boolean).slice(0, 12);
+        } catch {}
       } else if (type === "song") {
         if (imageFile) {
           const res = await base44.integrations.Core.UploadPublicFile({ file: imageFile });
@@ -130,6 +139,7 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
         cover_image_url: cover_image_url || undefined,
         nsfw,
         author_name,
+        tags: tags.length ? tags : undefined,
       });
 
       toast({ title: "Posted to your feed!" });
