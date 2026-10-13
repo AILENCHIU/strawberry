@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Image } from "@/components/ui/image";
 import { Play, Pause, Heart, Music2, Mic, ImageIcon, Flame, MoreHorizontal } from "lucide-react";
 import {
@@ -11,6 +12,7 @@ import SongMoreMenu from "@/components/SongMoreMenu";
 import EditPostDialog from "@/components/EditPostDialog";
 
 export default function FeedItem({ post, queue, onChanged }) {
+  const navigate = useNavigate();
   const { current, isPlaying, playTrack, togglePlay } = usePlayer();
   const isCurrent = current?.id === post.id;
   const isThisPlaying = isCurrent && isPlaying;
@@ -34,7 +36,10 @@ export default function FeedItem({ post, queue, onChanged }) {
     <article className="glass-pink rounded-3xl overflow-hidden">
       {/* media */}
       {(post.image_url || post.cover_image_url) && (
-        <div className="relative aspect-square sm:aspect-[4/3]">
+        <div
+          onClick={() => post.type === "photo" && navigate(`/post/${post.id}`)}
+          className={`relative aspect-square sm:aspect-[4/3] ${post.type === "photo" ? "cursor-pointer" : ""}`}
+        >
           <Image
             src={post.image_url || post.cover_image_url}
             alt={post.title || post.caption || "post"}

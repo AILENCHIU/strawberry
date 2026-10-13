@@ -1,15 +1,18 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Image } from "@/components/ui/image";
 import { Play, Pause, Music2, Mic, ImageIcon, Flame } from "lucide-react";
 import { usePlayer } from "@/lib/playerContext";
 import { cn } from "@/lib/utils";
 
 export default function MediaCard({ post, queue, className }) {
+  const navigate = useNavigate();
   const { current, isPlaying, playTrack, togglePlay } = usePlayer();
   const isCurrent = current?.id === post.id;
   const isThisPlaying = isCurrent && isPlaying;
   const hasAudio = (post.type === "song" || post.type === "voice") && !!post.audio_url;
   const cover = post.cover_image_url || post.image_url;
+  const openable = post.type === "photo" && !!cover;
 
   const handlePlay = (e) => {
     e.stopPropagation();
@@ -17,9 +20,14 @@ export default function MediaCard({ post, queue, className }) {
     else playTrack(post, queue);
   };
 
+  const open = () => { if (openable) navigate(`/post/${post.id}`); };
+
   return (
     <div className={cn("group relative w-40 shrink-0", className)}>
-      <div className="relative aspect-square rounded-2xl overflow-hidden bg-pink-100 shadow-md shadow-pink-200/40">
+      <div
+        onClick={open}
+        className={cn("relative aspect-square rounded-2xl overflow-hidden bg-pink-100 shadow-md shadow-pink-200/40", openable && "cursor-pointer")}
+      >
         {cover ? (
           <Image src={cover} alt={post.title || post.caption || ""} className="w-full h-full object-cover" fittingType="fill" />
         ) : (

@@ -14,6 +14,7 @@ import Home from '@/pages/Home';
 import Search from '@/pages/Search';
 import Library from '@/pages/Library';
 import PlaylistDetail from '@/pages/PlaylistDetail';
+import PostDetail from '@/pages/PostDetail';
 import Profile from '@/pages/Profile';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
@@ -52,6 +53,7 @@ const AuthenticatedApp = () => {
             <Route path="/search" element={<Search />} />
             <Route path="/library" element={<Library />} />
             <Route path="/playlist/:id" element={<PlaylistDetail />} />
+            <Route path="/post/:id" element={<PostDetail />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
         </Route>
