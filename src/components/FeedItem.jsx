@@ -88,7 +88,7 @@ export default function FeedItem({ post, queue, onChanged }) {
         </div>
 
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-pink-200/50">
-          <span className="text-xs text-pink-600/60 font-medium">by {post.author_name || "strawberry friend"}</span>
+          <button onClick={() => navigate(`/artist/${post.created_by_id}`)} className="text-xs text-pink-600/60 font-medium hover:text-pink-700 hover:underline">by {post.author_name || "strawberry friend"}</button>
           <div className="flex items-center gap-1">
             {hasAudio && !post.image_url && !post.cover_image_url && (
               <button

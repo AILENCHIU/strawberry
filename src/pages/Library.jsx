@@ -116,7 +116,7 @@ export default function Library() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className={`font-semibold text-sm truncate ${active ? "text-pink-600" : "text-foreground"}`}>{p.title || p.caption || "Untitled"}</p>
-                  <p className="text-xs text-pink-500/70 truncate capitalize">{p.type} • {p.author_name || "you"}</p>
+                  <p className="text-xs text-pink-500/70 truncate capitalize">{p.type} • <span onClick={(e) => { e.stopPropagation(); navigate(`/artist/${p.created_by_id}`); }} className="hover:text-pink-700 hover:underline">{p.author_name || "you"}</span></p>
                 </div>
                 {p.audio_url && (
                   <button

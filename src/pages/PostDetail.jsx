@@ -62,7 +62,7 @@ export default function PostDetail() {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             {post.title && <h1 className="font-display text-lg font-bold text-foreground">{post.title}</h1>}
-            <p className="text-xs text-pink-600/70 font-medium">by {post.author_name || "strawberry friend"}</p>
+            <button onClick={() => navigate(`/artist/${post.created_by_id}`)} className="text-xs text-pink-600/70 font-medium hover:text-pink-700 hover:underline">by {post.author_name || "strawberry friend"}</button>
           </div>
           <div className="flex flex-col items-center gap-0.5 text-pink-400">
             <Heart className="w-5 h-5" />
