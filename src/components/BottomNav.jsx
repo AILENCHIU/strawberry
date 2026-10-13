@@ -29,7 +29,7 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 px-3 pb-3">
+    <header className="sticky top-0 z-40 px-4 pt-4">
       <div className="max-w-3xl mx-auto glass rounded-3xl px-2 py-1.5 flex items-stretch justify-around">
         {renderTab(items[0])}
         {renderTab(items[1])}
@@ -38,13 +38,13 @@ export default function BottomNav() {
           className="flex flex-col items-center justify-center gap-1 py-1.5 flex-1 min-w-0"
           aria-label="Upload"
         >
-          <span className="w-11 h-11 rounded-2xl strawberry-gradient text-white flex items-center justify-center shadow-lg shadow-pink-300/50 -mt-3 ring-2 ring-white/60">
+          <span className="w-11 h-11 rounded-2xl strawberry-gradient text-white flex items-center justify-center shadow-lg shadow-pink-300/50 mb-1 ring-2 ring-white/60">
             <Plus className="w-6 h-6" />
           </span>
           <span className="text-[10px] font-medium text-pink-500/70">Upload</span>
         </button>
         {renderTab(items[2])}
       </div>
-    </nav>
+    </header>
   );
 }
