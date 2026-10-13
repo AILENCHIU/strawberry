@@ -7,13 +7,6 @@ import { Image } from "@/components/ui/image";
 import CarouselRow from "@/components/CarouselRow";
 import { Loader2, Play, Pause, ListMusic, Music2 } from "lucide-react";
 
-function greeting() {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 18) return "Good afternoon";
-  return "Good evening";
-}
-
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [playlists, setPlaylists] = useState([]);
@@ -55,7 +48,7 @@ export default function Home() {
   return (
     <div className="space-y-7">
       <header className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-bold text-gradient-pink">{greeting()}</h1>
+        <img src="https://media.base44.com/images/public/6acea8c53ba315332ee93348/dec0a2986_logo.jpg" alt="Strawberry" className="h-9 w-9 rounded-full object-cover" />
         <Link to="/profile" className="w-9 h-9 rounded-full glass-pink flex items-center justify-center text-pink-600 font-bold text-sm overflow-hidden">
           {me?.profile_image_url ? (
             <img src={me.profile_image_url} alt={me?.full_name || "profile"} className="w-full h-full object-cover" />
