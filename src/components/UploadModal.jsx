@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { base44 } from "@/api/base44Client";
 import { useToast } from "@/components/ui/use-toast";
 import { Music2, ImageIcon, Mic, Upload, Loader2, Flame, Sparkles, X } from "lucide-react";
+import { readId3Tags } from "@/lib/id3";
 
 export default function UploadModal({ open, onOpenChange, onDone }) {
   const { toast } = useToast();
@@ -34,11 +35,22 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
     setAudioPreview(null); setImagePreview(null);
   };
 
-  const pickAudio = (e) => {
+  const pickAudio = async (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
     setAudioFile(f);
     setAudioPreview(URL.createObjectURL(f));
+    const baseName = f.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim();
+    if (type === "song") {
+      const tags = await readId3Tags(f);
+      if (tags.title) setTitle(tags.title);
+      else if (baseName) setTitle(baseName);
+      if (tags.pictureFile && !hasCover) {
+        setImageFile(tags.pictureFile);
+        setAiCoverUrl(null);
+        setImagePreview(tags.pictureUrl);
+      }
+    }
   };
 
   const pickImage = (e) => {
@@ -134,7 +146,7 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass rounded-3xl max-w-lg p-0 overflow-hidden">
+      <DialogContent className="glass rounded-3xl max-w-lg p-0 max-h-[88vh] overflow-y-auto">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle className="font-display text-2xl font-bold text-gradient-pink">Share to Strawberry</DialogTitle>
           <DialogDescription className="text-pink-600/70">Drop a song, a photo, or a voice note.</DialogDescription>
@@ -213,7 +225,7 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
               <input ref={imageInputRef} type="file" accept="image/*" onChange={pickImage} className="hidden" />
               {imagePreview ? (
                 <div className="relative rounded-2xl overflow-hidden">
-                  <img src={imagePreview} alt="cover" className="w-full h-48 object-cover" />
+                  <img src={imagePreview} alt="cover" className="w-full aspect-square object-cover" />
                   <button onClick={clearImage} className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/40 backdrop-blur text-white flex items-center justify-center">
                     <X className="w-4 h-4" />
                   </button>
