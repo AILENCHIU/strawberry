@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import FeedItem from "@/components/FeedItem";
+import ProfilePictureDialog from "@/components/ProfilePictureDialog";
 import { usePlayer } from "@/lib/playerContext";
-import { Loader2, LogOut, Heart } from "lucide-react";
+import { Loader2, LogOut, Heart, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Profile() {
   const [me, setMe] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [picOpen, setPicOpen] = useState(false);
   const { playTrack } = usePlayer();
 
   const load = async () => {
@@ -34,9 +36,21 @@ export default function Profile() {
   return (
     <div className="space-y-6">
       <div className="glass rounded-3xl p-6 text-center">
-        <div className="w-20 h-20 rounded-full strawberry-gradient mx-auto flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-pink-300/40 mb-3">
-          {(me?.full_name || me?.email || "S").charAt(0).toUpperCase()}
-        </div>
+        <button
+          onClick={() => setPicOpen(true)}
+          className="relative w-20 h-20 rounded-full mx-auto flex items-center justify-center shadow-lg shadow-pink-300/40 mb-3 overflow-hidden group"
+        >
+          {me?.profile_image_url ? (
+            <img src={me.profile_image_url} alt={me?.full_name || "profile"} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full strawberry-gradient flex items-center justify-center text-white text-3xl font-bold">
+              {(me?.full_name || me?.email || "S").charAt(0).toUpperCase()}
+            </div>
+          )}
+          <span className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Camera className="w-6 h-6 text-white" />
+          </span>
+        </button>
         <h1 className="font-display text-2xl font-bold">{me?.full_name || me?.email || "Strawberry friend"}</h1>
         <p className="text-pink-500/70 text-sm">{me?.email}</p>
 
@@ -78,6 +92,13 @@ export default function Profile() {
           </div>
         )}
       </div>
+
+      <ProfilePictureDialog
+        open={picOpen}
+        onOpenChange={setPicOpen}
+        currentUrl={me?.profile_image_url}
+        onSaved={(url) => setMe((m) => ({ ...m, profile_image_url: url || "" }))}
+      />
     </div>
   );
 }

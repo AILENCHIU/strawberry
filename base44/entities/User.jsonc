@@ -7,6 +7,10 @@
         "admin",
         "user"
       ]
+    },
+    "profile_image_url": {
+      "type": "string",
+      "description": "URL of the user's profile picture"
     }
   },
   "required": [
