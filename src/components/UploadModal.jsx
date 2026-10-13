@@ -43,12 +43,15 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
     const baseName = f.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim();
     if (type === "song") {
       const tags = await readId3Tags(f);
+      const resolvedTitle = tags.title || baseName || "";
       if (tags.title) setTitle(tags.title);
       else if (baseName) setTitle(baseName);
-      if (tags.pictureFile && !hasCover) {
+      if (tags.pictureFile) {
         setImageFile(tags.pictureFile);
         setAiCoverUrl(null);
         setImagePreview(tags.pictureUrl);
+      } else if (resolvedTitle) {
+        generateCover(resolvedTitle);
       }
     }
   };
@@ -67,15 +70,16 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
     setImagePreview(null);
   };
 
-  const generateCover = async () => {
+  const generateCover = async (titleArg) => {
     if (generating) return;
-    if (type === "song" && !title.trim()) {
+    const songTitle = (titleArg ?? title).trim();
+    if (type === "song" && !songTitle) {
       toast({ title: "Add a song title first", description: "We generate the art from your title and caption.", variant: "destructive" });
       return;
     }
     setGenerating(true);
     try {
-      const prompt = `Glossy 3D album cover art for a song called "${title.trim()}".` +
+      const prompt = `Glossy 3D album cover art for a song called "${songTitle}".` +
         (caption.trim() ? ` Mood and theme: ${caption.trim()}.` : "") +
         " Strawberry pink and red color palette, dreamy, high-gloss, reflective, wet texture, sparkles, square album cover, no text, no words.";
       const res = await base44.integrations.Core.GenerateImage({ prompt });
