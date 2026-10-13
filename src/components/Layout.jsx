@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { Home as HomeIcon, ListMusic, User } from "lucide-react";
 import { Image } from "@/components/ui/image";
 
-const LOGO_URL = "https://media.base44.com/images/public/6acea8c53ba315332ee93348/b5982c069_strawberry.png";
+const LOGO_URL = "https://media.base44.com/images/public/6acea8c53ba315332ee93348/ca2106e15_strawberry2.png";
 import NowPlayingBar from "@/components/NowPlayingBar";
 import { cn } from "@/lib/utils";
 
