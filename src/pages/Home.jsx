@@ -18,18 +18,21 @@ export default function Home() {
   const [posts, setPosts] = useState([]);
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [me, setMe] = useState(null);
   const { playTrack, current, isPlaying, togglePlay } = usePlayer();
   const { refreshKey } = useUpload();
 
   const load = async () => {
     setLoading(true);
     try {
-      const [postRes, plRes] = await Promise.all([
+      const [postRes, plRes, user] = await Promise.all([
         base44.entities.Post.filter({}, { sort: "-created_date", limit: 50 }),
         base44.entities.Playlist.filter({}, { sort: "-created_date", limit: 20 }),
+        base44.auth.me().catch(() => null),
       ]);
       setPosts(postRes.items || []);
       setPlaylists(plRes.items || []);
+      setMe(user);
     } finally {
       setLoading(false);
     }
@@ -53,7 +56,13 @@ export default function Home() {
     <div className="space-y-7">
       <header className="flex items-center justify-between">
         <h1 className="font-display text-2xl font-bold text-gradient-pink">{greeting()}</h1>
-        <Link to="/profile" className="w-9 h-9 rounded-full glass-pink flex items-center justify-center text-pink-600 font-bold text-sm">S</Link>
+        <Link to="/profile" className="w-9 h-9 rounded-full glass-pink flex items-center justify-center text-pink-600 font-bold text-sm overflow-hidden">
+          {me?.profile_image_url ? (
+            <img src={me.profile_image_url} alt={me?.full_name || "profile"} className="w-full h-full object-cover" />
+          ) : (
+            (me?.full_name || me?.email || "S").charAt(0).toUpperCase()
+          )}
+        </Link>
       </header>
 
       {recent.length > 0 && (
