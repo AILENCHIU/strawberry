@@ -24,6 +24,9 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
   const [imagePreview, setImagePreview] = useState(null);
   const [busy, setBusy] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [copyrightBlocked, setCopyrightBlocked] = useState(null);
+  const [audioArtist, setAudioArtist] = useState("");
   const audioInputRef = useRef(null);
   const imageInputRef = useRef(null);
 
@@ -33,6 +36,35 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
     setType("song"); setTitle(""); setCaption(""); setNsfw(false);
     setAudioFile(null); setImageFile(null); setAiCoverUrl(null);
     setAudioPreview(null); setImagePreview(null);
+    setCopyrightBlocked(null); setAudioArtist("");
+  };
+
+  const checkCopyright = async (songTitle, artist) => {
+    setChecking(true);
+    setCopyrightBlocked(null);
+    try {
+      const query = artist ? `"${songTitle}" by ${artist}` : `"${songTitle}"`;
+      const res = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are a copyright detection assistant for a music-sharing platform. Determine whether the song "${query}" is a known, commercially released, copyrighted track (i.e. a song owned by a record label or major artist, available on streaming services like Spotify, Apple Music, etc.). Original, indie, self-produced, or user-created songs are NOT copyrighted in this sense. Search the web to verify. Return JSON with is_copyrighted (boolean) and reason (short explanation).`,
+        add_context_from_internet: true,
+        model: "gemini_3_flash",
+        response_json_schema: {
+          type: "object",
+          properties: {
+            is_copyrighted: { type: "boolean" },
+            reason: { type: "string" },
+          },
+          required: ["is_copyrighted", "reason"],
+        },
+      });
+      setCopyrightBlocked(res.is_copyrighted ? res.reason || "This appears to be a copyrighted track." : null);
+      return res.is_copyrighted;
+    } catch {
+      setCopyrightBlocked(null);
+      return false;
+    } finally {
+      setChecking(false);
+    }
   };
 
   const pickAudio = async (e) => {
@@ -46,6 +78,7 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
       const resolvedTitle = tags.title || baseName || "";
       if (tags.title) setTitle(tags.title);
       else if (baseName) setTitle(baseName);
+      if (tags.artist) setAudioArtist(tags.artist);
       if (tags.pictureFile) {
         setImageFile(tags.pictureFile);
         setAiCoverUrl(null);
@@ -99,6 +132,14 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
     if (type === "photo" && !imageFile) { toast({ title: "Pick an image first", variant: "destructive" }); return; }
     if (type === "song" && !title.trim()) { toast({ title: "Give your song a title", variant: "destructive" }); return; }
     if (type === "song" && !hasCover) { toast({ title: "Add cover art", description: "Upload one or let AI generate it.", variant: "destructive" }); return; }
+
+    if (type === "song") {
+      const isCopyrighted = await checkCopyright(title.trim(), audioArtist);
+      if (isCopyrighted) {
+        toast({ title: "Copyrighted track detected", description: copyrightBlocked || "We can't host copyrighted music. Upload your own original tracks only.", variant: "destructive" });
+        return;
+      }
+    }
 
     setBusy(true);
     try {
@@ -279,10 +320,10 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
 
           <Button
             onClick={submit}
-            disabled={busy}
+            disabled={busy || checking}
             className="w-full strawberry-gradient text-white rounded-2xl h-12 font-semibold text-base shadow-lg shadow-pink-300/40 hover:opacity-90"
           >
-            {busy ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Uploading...</> : "Post to feed"}
+            {checking ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Checking copyright...</> : busy ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Uploading...</> : "Post to feed"}
           </Button>
         </div>
       </DialogContent>
