@@ -98,7 +98,7 @@ export default function FeedItem({ post, queue, onChanged }) {
               </button>
             )}
             {post.type === "song" && <SongMoreMenu post={post} onChanged={onChanged} />}
-            {isOwner && (
+            {isOwner && post.type !== "song" && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="p-2 rounded-full text-pink-500 hover:bg-pink-100/60">
