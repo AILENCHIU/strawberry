@@ -7,22 +7,30 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, ListMusic, Loader2, Search as SearchIcon, Music2 } from "lucide-react";
+import { usePlayer } from "@/lib/playerContext";
+import { Plus, ListMusic, Loader2, Search as SearchIcon, Music2, Image as ImageIcon, Play } from "lucide-react";
 
 export default function Library() {
   const [playlists, setPlaylists] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [busy, setBusy] = useState(false);
   const [filter, setFilter] = useState("");
+  const { playTrack, current, isPlaying, togglePlay } = usePlayer();
 
   const load = async () => {
     setLoading(true);
     try {
-      const { items } = await base44.entities.Playlist.filter({}, { sort: "-created_date", limit: 100 });
-      setPlaylists(items || []);
+      const user = await base44.auth.me().catch(() => null);
+      const [plRes, postRes] = await Promise.all([
+        base44.entities.Playlist.filter({}, { sort: "-created_date", limit: 100 }),
+        user ? base44.entities.Post.filter({ created_by_id: user.id }, { sort: "-created_date", limit: 100 }) : Promise.resolve({ items: [] }),
+      ]);
+      setPlaylists(plRes.items || []);
+      setPosts(postRes.items || []);
     } finally {
       setLoading(false);
     }
@@ -41,6 +49,13 @@ export default function Library() {
   };
 
   const filtered = playlists.filter((p) => (p.title || "").toLowerCase().includes(filter.toLowerCase()));
+  const myUploads = posts.filter((p) => (p.title || p.caption || "").toLowerCase().includes(filter.toLowerCase()));
+  const songs = posts.filter((p) => p.audio_url);
+
+  const playPost = (post) => {
+    if (current?.id === post.id) togglePlay();
+    else playTrack(post, songs);
+  };
 
   return (
     <div className="space-y-4">
@@ -60,6 +75,37 @@ export default function Library() {
       </div>
 
       <div className="flex items-center justify-between px-1">
+        <span className="text-sm font-semibold text-pink-700">Uploads</span>
+      </div>
+
+      {loading ? null : myUploads.length === 0 ? (
+        <div className="glass-pink rounded-2xl p-6 text-center text-pink-600/70">
+          <p className="text-sm font-medium">{filter ? "No uploads match." : "No uploads yet."}</p>
+        </div>
+      ) : (
+        <div className="space-y-1">
+          {myUploads.map((p) => {
+            const active = current?.id === p.id;
+            const cover = p.cover_image_url || p.image_url;
+            return (
+              <button key={p.id} onClick={() => playPost(p)} className="w-full flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-pink-100/50 transition-colors text-left">
+                <div className="w-14 h-14 rounded-xl overflow-hidden strawberry-gradient flex items-center justify-center shrink-0 shadow-sm relative">
+                  {cover ? <img src={cover} alt={p.title || "upload"} className="w-full h-full object-cover" /> : p.type === "photo" ? <ImageIcon className="w-6 h-6 text-white" /> : <Music2 className="w-6 h-6 text-white" />}
+                  <span className={`absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity ${active && isPlaying ? "opacity-100" : "opacity-0"}`}>
+                    <Play className="w-5 h-5 text-white" />
+                  </span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className={`font-semibold text-sm truncate ${active ? "text-pink-600" : "text-foreground"}`}>{p.title || p.caption || "Untitled"}</p>
+                  <p className="text-xs text-pink-500/70 truncate capitalize">{p.type} • {p.author_name || "you"}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between px-1 pt-2">
         <span className="text-sm font-semibold text-pink-700">Playlists</span>
         <Button onClick={() => setCreateOpen(true)} size="sm" className="rounded-full strawberry-gradient text-white">
           <Plus className="w-4 h-4 mr-1" /> New
