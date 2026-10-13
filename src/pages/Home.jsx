@@ -57,9 +57,9 @@ export default function Home() {
               <button
                 key={p.id}
                 onClick={() => hasAudio && playPost(p)}
-                className="glass rounded-xl overflow-hidden flex items-center gap-3 pr-2 text-left hover:bg-white/70 transition-colors"
+                className="glass rounded-2xl overflow-hidden flex items-center gap-3 p-2 pr-3 text-left hover:bg-white/80 transition-colors"
               >
-                <div className="w-12 h-12 shrink-0 bg-pink-100">
+                <div className="w-12 h-12 shrink-0 rounded-xl overflow-hidden bg-pink-100">
                   {cover ? <Image src={cover} alt={p.title || ""} className="w-full h-full object-cover" fittingType="fill" /> : <div className="w-full h-full strawberry-gradient" />}
                 </div>
                 <span className="text-xs font-semibold truncate flex-1 leading-tight">{p.title || p.caption || p.type}</span>
@@ -83,7 +83,7 @@ export default function Home() {
           <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
             {playlists.map((pl) => (
               <Link key={pl.id} to={`/playlist/${pl.id}`} className="w-40 shrink-0 group">
-                <div className="aspect-square rounded-2xl overflow-hidden mb-2 strawberry-gradient flex items-center justify-center shadow-md shadow-pink-200/40">
+                <div className="aspect-square rounded-3xl overflow-hidden mb-2 strawberry-gradient flex items-center justify-center shadow-lg shadow-pink-200/40 ring-1 ring-white/40">
                   {pl.cover_image_url ? <Image src={pl.cover_image_url} alt={pl.title} className="w-full h-full object-cover" fittingType="fill" /> : <ListMusic className="w-10 h-10 text-white" />}
                 </div>
                 <p className="font-semibold text-sm truncate">{pl.title}</p>

@@ -26,7 +26,7 @@ export default function MediaCard({ post, queue, className }) {
     <div className={cn("group relative w-40 shrink-0", className)}>
       <div
         onClick={open}
-        className={cn("relative aspect-square rounded-2xl overflow-hidden bg-pink-100 shadow-md shadow-pink-200/40", openable && "cursor-pointer")}
+        className={cn("relative aspect-square rounded-3xl overflow-hidden bg-pink-100/60 backdrop-blur-xl shadow-lg shadow-pink-200/40 ring-1 ring-white/40", openable && "cursor-pointer")}
       >
         {cover ? (
           <Image src={cover} alt={post.title || post.caption || ""} className="w-full h-full object-cover" fittingType="fill" />
