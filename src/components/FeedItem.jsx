@@ -3,6 +3,7 @@ import { Image } from "@/components/ui/image";
 import { Play, Pause, Heart, Music2, Mic, ImageIcon, Flame } from "lucide-react";
 import { usePlayer } from "@/lib/playerContext";
 import { cn } from "@/lib/utils";
+import SongMoreMenu from "@/components/SongMoreMenu";
 
 export default function FeedItem({ post, queue }) {
   const { current, isPlaying, playTrack, togglePlay } = usePlayer();
@@ -70,15 +71,18 @@ export default function FeedItem({ post, queue }) {
 
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-pink-200/50">
           <span className="text-xs text-pink-600/60 font-medium">by {post.author_name || "strawberry friend"}</span>
-          {hasAudio && !post.image_url && !post.cover_image_url && (
-            <button
-              onClick={handlePlay}
-              className="flex items-center gap-2 px-4 py-2 rounded-full strawberry-gradient text-white text-sm font-semibold shadow-md shadow-pink-300/40"
-            >
-              {isThisPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
-              {isThisPlaying ? "Pause" : "Play"}
-            </button>
-          )}
+          <div className="flex items-center gap-1">
+            {hasAudio && !post.image_url && !post.cover_image_url && (
+              <button
+                onClick={handlePlay}
+                className="flex items-center gap-2 px-4 py-2 rounded-full strawberry-gradient text-white text-sm font-semibold shadow-md shadow-pink-300/40"
+              >
+                {isThisPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                {isThisPlaying ? "Pause" : "Play"}
+              </button>
+            )}
+            {post.type === "song" && <SongMoreMenu post={post} />}
+          </div>
         </div>
       </div>
     </article>

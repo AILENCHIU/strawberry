@@ -77,6 +77,12 @@ export function PlayerProvider({ children }) {
     if (audioRef.current) audioRef.current.currentTime = time;
   }, []);
 
+  const addToQueue = useCallback((track) => {
+    if (!track?.audio_url) return;
+    setQueue((q) => (q.some((t) => t.id === track.id) ? q : [...q, track]));
+    if (!queueRef.current.length && !current) loadAndPlay(track);
+  }, [current, loadAndPlay]);
+
   useEffect(() => {
     const audio = new Audio();
     audioRef.current = audio;
@@ -101,7 +107,7 @@ export function PlayerProvider({ children }) {
 
   const value = {
     current, queue, index, isPlaying, shuffle, progress, duration,
-    playTrack, togglePlay, next, prev, seek, setShuffle,
+    playTrack, togglePlay, next, prev, seek, setShuffle, addToQueue,
   };
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;
