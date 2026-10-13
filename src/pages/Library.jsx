@@ -80,7 +80,6 @@ export default function Library() {
     <div className="space-y-4">
       <header className="flex items-center justify-between">
         <h1 className="font-display text-2xl font-bold text-gradient-pink">Your Library</h1>
-        <Link to="/profile" className="w-9 h-9 rounded-full glass-pink flex items-center justify-center text-pink-600 font-bold text-sm">S</Link>
       </header>
 
       <div className="relative">

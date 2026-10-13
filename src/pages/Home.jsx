@@ -47,17 +47,6 @@ export default function Home() {
 
   return (
     <div className="space-y-7">
-      <header className="flex items-center justify-between">
-        <img src="https://media.base44.com/images/public/6acea8c53ba315332ee93348/dec0a2986_logo.jpg" alt="Strawberry" className="h-9 w-9 rounded-full object-cover" />
-        <Link to="/profile" className="w-9 h-9 rounded-full glass-pink flex items-center justify-center text-pink-600 font-bold text-sm overflow-hidden">
-          {me?.profile_image_url ? (
-            <img src={me.profile_image_url} alt={me?.full_name || "profile"} className="w-full h-full object-cover" />
-          ) : (
-            (me?.full_name || me?.email || "S").charAt(0).toUpperCase()
-          )}
-        </Link>
-      </header>
-
       {recent.length > 0 && (
         <div className="grid grid-cols-2 gap-2.5">
           {recent.map((p) => {

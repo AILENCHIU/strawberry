@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import NowPlayingBar from "@/components/NowPlayingBar";
-import BottomNav from "@/components/BottomNav";
+import TopNav from "@/components/TopNav";
 import { UploadProvider } from "@/lib/uploadContext";
 
 export default function Layout() {
@@ -14,12 +14,14 @@ export default function Layout() {
           <div className="absolute bottom-0 left-1/3 w-96 h-96 rounded-full bg-rose-300/30 blur-3xl" />
         </div>
 
-        <main className="max-w-3xl mx-auto px-4 pt-4 pb-44">
-          <Outlet />
-        </main>
+        <div className="max-w-3xl mx-auto px-4">
+          <TopNav />
+          <main className="pt-2 pb-40">
+            <Outlet />
+          </main>
+        </div>
 
         <NowPlayingBar />
-        <BottomNav />
       </div>
     </UploadProvider>
   );
