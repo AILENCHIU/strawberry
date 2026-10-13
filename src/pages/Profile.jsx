@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import FeedItem from "@/components/FeedItem";
 import ProfilePictureDialog from "@/components/ProfilePictureDialog";
 import { usePlayer } from "@/lib/playerContext";
-import { Loader2, LogOut, Heart, Camera } from "lucide-react";
+import { Loader2, LogOut, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Profile() {
@@ -64,7 +64,7 @@ export default function Profile() {
             <p className="text-xs text-pink-600/70 font-medium">Plays</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-gradient-pink flex items-center gap-1 justify-center">{totalLikes}<Heart className="w-4 h-4 text-pink-400" /></p>
+            <p className="text-2xl font-bold text-gradient-pink">{totalLikes}</p>
             <p className="text-xs text-pink-600/70 font-medium">Likes</p>
           </div>
         </div>
