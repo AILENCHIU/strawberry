@@ -100,53 +100,15 @@ export default function Register() {
           <img src={LOGO} alt="Strawberry" className="w-16 h-16 rounded-2xl object-cover shadow-lg shadow-pink-300/40 mb-4" />
         </div>
 
-        {/* STEP 0 — welcome */}
+        {/* STEP 0 — email */}
         {step === 0 && (
           <div className="space-y-5">
             <div className="text-center">
               <h1 className="text-2xl font-bold text-foreground">Join Strawberry</h1>
-              <p className="text-sm text-muted-foreground mt-1.5">It only takes a minute</p>
+              <p className="text-sm text-muted-foreground mt-1.5">What's your email?</p>
             </div>
-            <Button
-              onClick={handleGoogle}
-              className="w-full h-12 text-sm font-medium bg-white text-foreground border border-border hover:bg-accent rounded-2xl"
-            >
-              <GoogleIcon className="w-5 h-5 mr-2" />
-              Continue with Google
-            </Button>
-            <div className="relative py-1">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-background px-3 text-muted-foreground">or</span>
-              </div>
-            </div>
-            <Button
-              onClick={() => setStep(1)}
-              className="w-full h-12 text-sm font-semibold strawberry-gradient text-white rounded-2xl shadow-lg shadow-pink-300/40"
-            >
-              Sign up with email
-            </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link to={returnToLogin} className="text-primary font-medium hover:underline">Log in</Link>
-            </p>
-          </div>
-        )}
-
-        {/* STEP 1 — email + password */}
-        {step === 1 && (
-          <div className="space-y-5">
-            <button onClick={back} className="flex items-center text-sm text-muted-foreground hover:text-foreground">
-              <ArrowLeft className="w-4 h-4 mr-1" /> Back
-            </button>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Create your account</h1>
-              <p className="text-sm text-muted-foreground mt-1.5">Enter your email and a password</p>
-            </div>
-            {error && <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm">{error}</div>}
-            <form onSubmit={handleRegister} className="space-y-4">
+            {error && <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm text-center">{error}</div>}
+            <form onSubmit={(e) => { e.preventDefault(); if (email.trim()) { setError(""); setStep(1); } }} className="space-y-4">
               <Input
                 type="email"
                 autoFocus
@@ -156,10 +118,40 @@ export default function Register() {
                 className="h-12 rounded-2xl"
                 required
               />
+              <Button type="submit" className="w-full h-12 text-sm font-semibold strawberry-gradient text-white rounded-2xl shadow-lg shadow-pink-300/40">
+                Continue
+              </Button>
+            </form>
+            <div className="flex flex-col items-center gap-3 pt-2">
+              <button onClick={handleGoogle} className="flex items-center text-xs text-muted-foreground hover:text-foreground">
+                <GoogleIcon className="w-3.5 h-3.5 mr-1.5" />
+                or continue with Google
+              </button>
+              <p className="text-xs text-muted-foreground">
+                Already have an account?{" "}
+                <Link to={returnToLogin} className="text-primary font-medium hover:underline">Sign in</Link>
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 1 — password */}
+        {step === 1 && (
+          <div className="space-y-5">
+            <button onClick={back} className="flex items-center text-sm text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="w-4 h-4 mr-1" /> Back
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Create a password</h1>
+              <p className="text-sm text-muted-foreground mt-1.5">{email}</p>
+            </div>
+            {error && <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm">{error}</div>}
+            <form onSubmit={handleRegister} className="space-y-4">
               <Input
                 type="password"
-                placeholder="Password"
+                autoFocus
                 autoComplete="new-password"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="h-12 rounded-2xl"
