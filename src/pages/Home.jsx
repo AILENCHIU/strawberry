@@ -5,7 +5,7 @@ import { useUpload } from "@/lib/uploadContext";
 import { Link } from "react-router-dom";
 import { Image } from "@/components/ui/image";
 import CarouselRow from "@/components/CarouselRow";
-import { Loader2, Play, Pause, ListMusic } from "lucide-react";
+import { Loader2, Play, Pause, ListMusic, Music2 } from "lucide-react";
 
 function greeting() {
   const h = new Date().getHours();
@@ -105,7 +105,7 @@ export default function Home() {
 
       {posts.length === 0 && (
         <div className="glass-pink rounded-3xl p-10 text-center text-pink-600/70">
-          <div className="text-5xl mb-3">🍓</div>
+          <div className="flex justify-center mb-3"><Music2 className="w-10 h-10 text-pink-400" /></div>
           <p className="font-medium">Nothing here yet. Tap upload to share your first sound or snap!</p>
         </div>
       )}

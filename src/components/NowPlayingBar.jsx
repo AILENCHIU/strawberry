@@ -1,7 +1,7 @@
 import React from "react";
 import { Image } from "@/components/ui/image";
 import { usePlayer } from "@/lib/playerContext";
-import { Play, Pause, SkipBack, SkipForward, Shuffle } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Shuffle, Music2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function fmt(s) {
@@ -24,7 +24,7 @@ export default function NowPlayingBar() {
           {current.cover_image_url || current.image_url ? (
             <Image src={current.cover_image_url || current.image_url} alt={current.title} className="w-full h-full object-cover" fittingType="fill" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-xl">🍓</div>
+            <div className="w-full h-full flex items-center justify-center"><Music2 className="w-5 h-5 text-pink-400" /></div>
           )}
         </div>
         <div className="min-w-0 flex-1">

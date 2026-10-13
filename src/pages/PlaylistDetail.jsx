@@ -102,7 +102,7 @@ export default function PlaylistDetail() {
           <h3 className="font-bold text-pink-800 mb-3">Add songs</h3>
           <div className="space-y-1 max-h-80 overflow-y-auto">
             {available.length === 0 ? (
-              <p className="text-sm text-pink-600/60 text-center py-3">All songs added 🍓</p>
+              <p className="text-sm text-pink-600/60 text-center py-3">All songs added</p>
             ) : available.map((s) => (
               <div key={s.id} className="flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-pink-100/50">
                 <div className="w-10 h-10 rounded-lg overflow-hidden bg-pink-100 shrink-0">

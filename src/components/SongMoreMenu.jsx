@@ -34,7 +34,7 @@ export default function SongMoreMenu({ post }) {
     }
     try {
       await base44.entities.Playlist.update(pl.id, { track_ids: [...ids, post.id] });
-      toast({ title: `Added to "${pl.title}" 🍓` });
+      toast({ title: `Added to "${pl.title}"` });
     } catch (err) {
       toast({ title: "Couldn't add", description: err?.message, variant: "destructive" });
     }

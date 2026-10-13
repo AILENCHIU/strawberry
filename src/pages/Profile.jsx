@@ -35,7 +35,7 @@ export default function Profile() {
     <div className="space-y-6">
       <div className="glass rounded-3xl p-6 text-center">
         <div className="w-20 h-20 rounded-full strawberry-gradient mx-auto flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-pink-300/40 mb-3">
-          {(me?.full_name || me?.email || "🍓").charAt(0).toUpperCase()}
+          {(me?.full_name || me?.email || "S").charAt(0).toUpperCase()}
         </div>
         <h1 className="font-display text-2xl font-bold">{me?.full_name || me?.email || "Strawberry friend"}</h1>
         <p className="text-pink-500/70 text-sm">{me?.email}</p>
@@ -70,7 +70,7 @@ export default function Profile() {
           <div className="flex justify-center py-12"><Loader2 className="w-7 h-7 animate-spin text-pink-400" /></div>
         ) : posts.length === 0 ? (
           <div className="glass-pink rounded-3xl p-10 text-center text-pink-600/70">
-            <p className="font-medium">You haven't posted yet. Go share something! 🍓</p>
+            <p className="font-medium">You haven't posted yet. Go share something!</p>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-4">

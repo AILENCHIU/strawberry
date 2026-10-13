@@ -133,7 +133,7 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
         author_name,
       });
 
-      toast({ title: "Posted to your feed! 🍓" });
+      toast({ title: "Posted to your feed!" });
       reset();
       onOpenChange(false);
       onDone?.();
@@ -272,7 +272,7 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
             disabled={busy}
             className="w-full strawberry-gradient text-white rounded-2xl h-12 font-semibold text-base shadow-lg shadow-pink-300/40 hover:opacity-90"
           >
-            {busy ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Uploading...</> : "Post to feed 🍓"}
+            {busy ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Uploading...</> : "Post to feed"}
           </Button>
         </div>
       </DialogContent>
