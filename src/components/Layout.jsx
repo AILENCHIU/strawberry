@@ -1,6 +1,9 @@
 import React from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Home as HomeIcon, ListMusic, User, Disc3 } from "lucide-react";
+import { Home as HomeIcon, ListMusic, User } from "lucide-react";
+import { Image } from "@/components/ui/image";
+
+const LOGO_URL = "https://media.base44.com/images/public/6acea8c53ba315332ee93348/b5982c069_strawberry.png";
 import NowPlayingBar from "@/components/NowPlayingBar";
 import { cn } from "@/lib/utils";
 
@@ -25,8 +28,8 @@ export default function Layout() {
       <header className="sticky top-0 z-40 px-4 pt-4">
         <nav className="max-w-3xl mx-auto glass rounded-3xl px-5 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-2xl strawberry-gradient flex items-center justify-center shadow-lg shadow-pink-300/40">
-              <Disc3 className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-2xl overflow-hidden shadow-lg shadow-pink-300/40 ring-1 ring-pink-200/60">
+              <Image src={LOGO_URL} alt="Strawberry" className="w-full h-full object-cover" fittingType="fill" />
             </div>
             <span className="font-display text-xl font-bold tracking-tight text-gradient-pink">Strawberry</span>
           </Link>
