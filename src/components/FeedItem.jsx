@@ -58,9 +58,6 @@ export default function FeedItem({ post, queue }) {
                 {post.type === "voice" && <Mic className="w-3 h-3" />}
                 {post.type}
               </span>
-              {post.genre && post.type === "song" && (
-                <span className="text-xs text-pink-500/70 font-medium">{post.genre}</span>
-              )}
             </div>
             {post.title && <h3 className="font-bold text-lg leading-tight text-foreground truncate">{post.title}</h3>}
             {post.caption && <p className="text-sm text-muted-foreground mt-1 line-clamp-3">{post.caption}</p>}

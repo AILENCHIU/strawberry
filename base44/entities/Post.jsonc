@@ -25,9 +25,6 @@
     "cover_image_url": {
       "type": "string"
     },
-    "genre": {
-      "type": "string"
-    },
     "duration": {
       "type": "number"
     },

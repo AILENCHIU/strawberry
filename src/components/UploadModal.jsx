@@ -8,28 +8,30 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { base44 } from "@/api/base44Client";
 import { useToast } from "@/components/ui/use-toast";
-import { Music2, ImageIcon, Mic, Upload, Loader2, Flame } from "lucide-react";
-
-const GENRES = ["Pop", "R&B", "Hip-Hop", "Indie", "Electronic", "Rock", "Lo-fi", "Ambient", "Folk", "Other"];
+import { Music2, ImageIcon, Mic, Upload, Loader2, Flame, Sparkles, X } from "lucide-react";
 
 export default function UploadModal({ open, onOpenChange, onDone }) {
   const { toast } = useToast();
   const [type, setType] = useState("song");
   const [title, setTitle] = useState("");
   const [caption, setCaption] = useState("");
-  const [genre, setGenre] = useState("Pop");
   const [nsfw, setNsfw] = useState(false);
   const [audioFile, setAudioFile] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [aiCoverUrl, setAiCoverUrl] = useState(null);
   const [audioPreview, setAudioPreview] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const audioInputRef = useRef(null);
   const imageInputRef = useRef(null);
 
+  const hasCover = !!(imageFile || aiCoverUrl);
+
   const reset = () => {
-    setType("song"); setTitle(""); setCaption(""); setGenre("Pop"); setNsfw(false);
-    setAudioFile(null); setImageFile(null); setAudioPreview(null); setImagePreview(null);
+    setType("song"); setTitle(""); setCaption(""); setNsfw(false);
+    setAudioFile(null); setImageFile(null); setAiCoverUrl(null);
+    setAudioPreview(null); setImagePreview(null);
   };
 
   const pickAudio = (e) => {
@@ -43,7 +45,36 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
     const f = e.target.files?.[0];
     if (!f) return;
     setImageFile(f);
+    setAiCoverUrl(null);
     setImagePreview(URL.createObjectURL(f));
+  };
+
+  const clearImage = () => {
+    setImageFile(null);
+    setAiCoverUrl(null);
+    setImagePreview(null);
+  };
+
+  const generateCover = async () => {
+    if (generating) return;
+    if (type === "song" && !title.trim()) {
+      toast({ title: "Add a song title first", description: "We generate the art from your title and caption.", variant: "destructive" });
+      return;
+    }
+    setGenerating(true);
+    try {
+      const prompt = `Glossy 3D album cover art for a song called "${title.trim()}".` +
+        (caption.trim() ? ` Mood and theme: ${caption.trim()}.` : "") +
+        " Strawberry pink and red color palette, dreamy, high-gloss, reflective, wet texture, sparkles, square album cover, no text, no words.";
+      const res = await base44.integrations.Core.GenerateImage({ prompt });
+      setAiCoverUrl(res.url);
+      setImageFile(null);
+      setImagePreview(res.url);
+    } catch (err) {
+      toast({ title: "Couldn't generate art", description: err?.message || "Try again or upload your own.", variant: "destructive" });
+    } finally {
+      setGenerating(false);
+    }
   };
 
   const submit = async () => {
@@ -52,6 +83,7 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
     if (type === "photo" && !imageFile) { toast({ title: "Pick an image first", variant: "destructive" }); return; }
     if (type === "voice" && !audioFile) { toast({ title: "Record or pick an audio file", variant: "destructive" }); return; }
     if (type === "song" && !title.trim()) { toast({ title: "Give your song a title", variant: "destructive" }); return; }
+    if (type === "song" && !hasCover) { toast({ title: "Add cover art", description: "Upload one or let AI generate it.", variant: "destructive" }); return; }
 
     setBusy(true);
     try {
@@ -66,10 +98,16 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
       }
       let image_url = "";
       let cover_image_url = "";
-      if (imageFile) {
+      if (type === "photo" && imageFile) {
         const res = await base44.integrations.Core.UploadPublicFile({ file: imageFile });
-        if (type === "photo") image_url = res.file_url;
-        else cover_image_url = res.file_url;
+        image_url = res.file_url;
+      } else if (type === "song") {
+        if (imageFile) {
+          const res = await base44.integrations.Core.UploadPublicFile({ file: imageFile });
+          cover_image_url = res.file_url;
+        } else if (aiCoverUrl) {
+          cover_image_url = aiCoverUrl;
+        }
       }
 
       await base44.entities.Post.create({
@@ -79,7 +117,6 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
         audio_url: audio_url || undefined,
         image_url: image_url || undefined,
         cover_image_url: cover_image_url || undefined,
-        genre: type === "song" ? genre : undefined,
         nsfw,
         author_name,
       });
@@ -143,11 +180,9 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
             </div>
           )}
 
-          {(type === "photo" || type === "song") && (
+          {type === "photo" && (
             <div>
-              <Label className="text-pink-700 font-medium mb-2 block">
-                {type === "photo" ? "Image" : "Cover art (optional)"}
-              </Label>
+              <Label className="text-pink-700 font-medium mb-2 block">Image</Label>
               <input ref={imageInputRef} type="file" accept="image/*" onChange={pickImage} className="hidden" />
               <button
                 onClick={() => imageInputRef.current?.click()}
@@ -166,15 +201,49 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
           )}
 
           {type === "song" && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Label className="text-pink-700 font-medium">Cover art <span className="text-pink-400 font-normal">(required)</span></Label>
+                {hasCover && (
+                  <button onClick={clearImage} className="text-xs text-pink-500 hover:text-pink-700 flex items-center gap-1">
+                    <X className="w-3 h-3" /> Clear
+                  </button>
+                )}
+              </div>
+              <input ref={imageInputRef} type="file" accept="image/*" onChange={pickImage} className="hidden" />
+              {imagePreview ? (
+                <div className="relative rounded-2xl overflow-hidden">
+                  <img src={imagePreview} alt="cover" className="w-full h-48 object-cover" />
+                  <button onClick={clearImage} className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/40 backdrop-blur text-white flex items-center justify-center">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => imageInputRef.current?.click()}
+                    className="glass-pink rounded-2xl py-5 flex flex-col items-center gap-1.5 text-pink-600 hover:bg-pink-100/70 transition-colors"
+                  >
+                    <ImageIcon className="w-6 h-6 text-pink-500" />
+                    <span className="text-xs font-medium">Upload</span>
+                  </button>
+                  <button
+                    onClick={generateCover}
+                    disabled={generating}
+                    className="strawberry-gradient text-white rounded-2xl py-5 flex flex-col items-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-60"
+                  >
+                    {generating ? <Loader2 className="w-6 h-6 animate-spin" /> : <Sparkles className="w-6 h-6" />}
+                    <span className="text-xs font-medium">{generating ? "Making..." : "AI generate"}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {type === "song" && (
             <div className="space-y-2">
               <Label htmlFor="title" className="text-pink-700 font-medium">Song title</Label>
               <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="My new track" className="rounded-xl bg-white/70 border-pink-200" />
-              <div>
-                <Label className="text-pink-700 font-medium mb-1.5 block text-sm">Genre</Label>
-                <select value={genre} onChange={(e) => setGenre(e.target.value)} className="w-full rounded-xl bg-white/70 border border-pink-200 px-3 py-2 text-sm">
-                  {GENRES.map((g) => <option key={g} value={g}>{g}</option>)}
-                </select>
-              </div>
             </div>
           )}
 
