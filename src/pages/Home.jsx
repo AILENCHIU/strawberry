@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePlayer } from "@/lib/playerContext";
 import { useUpload } from "@/lib/uploadContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Image } from "@/components/ui/image";
 import CarouselRow from "@/components/CarouselRow";
 import { Loader2, Play, Pause, ListMusic, Music2 } from "lucide-react";
@@ -12,6 +12,7 @@ export default function Home() {
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [me, setMe] = useState(null);
+  const navigate = useNavigate();
   const { playTrack, current, isPlaying, togglePlay } = usePlayer();
   const { refreshKey } = useUpload();
 
@@ -37,6 +38,12 @@ export default function Home() {
   const trending = [...posts].sort((a, b) => (b.plays || 0) - (a.plays || 0)).slice(0, 20);
   const recent = posts.slice(0, 6);
   const fresh = posts.slice(0, 20);
+  const stripPosts = posts.filter((p) => p.cover_image_url || p.image_url).slice(0, 8);
+
+  const openPost = (p) => {
+    if (p.type === "photo") navigate(`/post/${p.id}`);
+    else if (p.audio_url) playPost(p);
+  };
 
   const playPost = (post) => {
     if (current?.id === post.id) togglePlay();
@@ -47,9 +54,26 @@ export default function Home() {
 
   return (
     <div className="space-y-7">
-      <header className="flex items-center justify-between">
-        <img src="https://media.base44.com/images/public/6acea8c53ba315332ee93348/dec0a2986_logo.jpg" alt="Strawberry" className="h-9 w-9 rounded-full object-cover" />
-        <Link to="/profile" className="w-9 h-9 rounded-full glass-pink flex items-center justify-center text-pink-600 font-bold text-sm overflow-hidden">
+      <header className="home-header">
+        <img src="https://media.base44.com/images/public/6acea8c53ba315332ee93348/dec0a2986_logo.jpg" alt="Strawberry" className="brand-mark" />
+        <div className="recent-strip">
+          {stripPosts.map((p) => {
+            const cover = p.cover_image_url || p.image_url;
+            return (
+              <Image
+                key={p.id}
+                src={cover}
+                alt={p.title || p.caption || ""}
+                fittingType="fill"
+                onClick={() => openPost(p)}
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPost(p); } }}
+                className="post-thumb"
+              />
+            );
+          })}
+        </div>
+        <Link to="/profile" aria-label="Profile" className="profile-link">
           {me?.profile_image_url ? (
             <img src={me.profile_image_url} alt={me?.full_name || "profile"} className="w-full h-full object-cover" />
           ) : (
