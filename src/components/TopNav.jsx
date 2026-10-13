@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home as HomeIcon, Search as SearchIcon, Library, Plus } from "lucide-react";
+import { Home as HomeIcon, Search as SearchIcon, Library, Plus, Send } from "lucide-react";
 import { useUpload } from "@/lib/uploadContext";
 import { base44 } from "@/api/base44Client";
 import { cn } from "@/lib/utils";
@@ -42,6 +42,7 @@ export default function TopNav() {
               <Plus className="w-4 h-4" />
             </span>
           </button>
+          {renderTab({ to: "/messages", icon: Send })}
           {renderTab(tabs[2])}
         </div>
 

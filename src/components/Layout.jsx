@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import NowPlayingBar from "@/components/NowPlayingBar";
 import TopNav from "@/components/TopNav";
 import { UploadProvider } from "@/lib/uploadContext";
+import { base44 } from "@/api/base44Client";
 
 export default function Layout() {
+  useEffect(() => {
+    const updatePresence = () => base44.auth.updateMe({ last_active: new Date().toISOString() }).catch(() => {});
+    updatePresence();
+    const interval = setInterval(updatePresence, 30000);
+    return () => clearInterval(interval);
+  }, []);
   return (
     <UploadProvider>
       <div className="min-h-screen relative">

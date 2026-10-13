@@ -17,6 +17,7 @@ import PlaylistDetail from '@/pages/PlaylistDetail';
 import PostDetail from '@/pages/PostDetail';
 import Profile from '@/pages/Profile';
 import Artist from '@/pages/Artist';
+import Messages from '@/pages/Messages';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -57,6 +58,7 @@ const AuthenticatedApp = () => {
             <Route path="/post/:id" element={<PostDetail />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/artist/:userId" element={<Artist />} />
+            <Route path="/messages" element={<Messages />} />
           </Route>
         </Route>
         <Route path="*" element={<PageNotFound />} />
