@@ -29,9 +29,9 @@ export default function BottomNav() {
       <div className="max-w-3xl mx-auto glass rounded-3xl px-2 flex items-stretch justify-around">
         {renderTab(tabs[0])}
         {renderTab(tabs[1])}
-        <button onClick={openUpload} className="flex flex-col items-center justify-center gap-0.5 flex-1 min-w-0" aria-label="Upload">
-          <span className="w-12 h-12 rounded-2xl strawberry-gradient text-white flex items-center justify-center shadow-lg shadow-pink-300/50 -mt-5 ring-2 ring-white/70">
-            <Plus className="w-6 h-6" />
+        <button onClick={openUpload} className="flex flex-col items-center justify-center gap-1 py-2.5 flex-1 min-w-0" aria-label="Upload">
+          <span className="w-10 h-10 rounded-2xl strawberry-gradient text-white flex items-center justify-center shadow-lg shadow-pink-300/50">
+            <Plus className="w-5 h-5" />
           </span>
           <span className="text-[10px] font-medium text-pink-500/70">Upload</span>
         </button>

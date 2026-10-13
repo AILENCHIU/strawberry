@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { base44 } from "@/api/base44Client";
 import { useToast } from "@/components/ui/use-toast";
-import { Music2, ImageIcon, Mic, Upload, Loader2, Flame, Sparkles, X } from "lucide-react";
+import { Music2, ImageIcon, Upload, Loader2, Flame, Sparkles, X } from "lucide-react";
 import { readId3Tags } from "@/lib/id3";
 
 export default function UploadModal({ open, onOpenChange, onDone }) {
@@ -93,7 +93,6 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
     if (busy) return;
     if (type === "song" && !audioFile) { toast({ title: "Pick an audio file first", variant: "destructive" }); return; }
     if (type === "photo" && !imageFile) { toast({ title: "Pick an image first", variant: "destructive" }); return; }
-    if (type === "voice" && !audioFile) { toast({ title: "Record or pick an audio file", variant: "destructive" }); return; }
     if (type === "song" && !title.trim()) { toast({ title: "Give your song a title", variant: "destructive" }); return; }
     if (type === "song" && !hasCover) { toast({ title: "Add cover art", description: "Upload one or let AI generate it.", variant: "destructive" }); return; }
 
@@ -149,20 +148,17 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
       <DialogContent className="glass-pink rounded-3xl max-w-lg p-0 max-h-[88vh] overflow-y-auto">
         <div className="px-6 pt-6 pb-6 space-y-5">
           <Tabs value={type} onValueChange={setType}>
-            <TabsList className="grid grid-cols-3 w-full bg-pink-100/50 rounded-2xl">
+            <TabsList className="grid grid-cols-2 w-full bg-pink-100/50 rounded-2xl">
               <TabsTrigger value="song" className="rounded-2xl data-[state=active]:strawberry-gradient data-[state=active]:text-white">
                 <Music2 className="w-4 h-4 mr-1.5" /> Song
               </TabsTrigger>
               <TabsTrigger value="photo" className="rounded-2xl data-[state=active]:strawberry-gradient data-[state=active]:text-white">
                 <ImageIcon className="w-4 h-4 mr-1.5" /> Photo
               </TabsTrigger>
-              <TabsTrigger value="voice" className="rounded-2xl data-[state=active]:strawberry-gradient data-[state=active]:text-white">
-                <Mic className="w-4 h-4 mr-1.5" /> Voice
-              </TabsTrigger>
             </TabsList>
           </Tabs>
 
-          {(type === "song" || type === "voice") && (
+          {type === "song" && (
             <div>
               <Label className="text-pink-700 font-medium mb-2 block">Audio file</Label>
               <input ref={audioInputRef} type="file" accept="audio/*" onChange={pickAudio} className="hidden" />
