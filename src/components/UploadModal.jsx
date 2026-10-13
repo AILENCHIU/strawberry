@@ -192,7 +192,7 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
                 className="w-full glass-pink rounded-2xl py-6 flex flex-col items-center gap-2 text-pink-600 hover:bg-pink-100/70 transition-colors overflow-hidden"
               >
                 {imagePreview ? (
-                  <img src={imagePreview} alt="preview" className="w-full h-40 object-cover rounded-xl" />
+                  <img src={imagePreview} alt="preview" className="w-full max-h-72 object-contain rounded-xl" />
                 ) : (
                   <>
                     <ImageIcon className="w-7 h-7 text-pink-500" />
