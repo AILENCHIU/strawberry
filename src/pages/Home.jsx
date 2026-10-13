@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePlayer } from "@/lib/playerContext";
 import { useUpload } from "@/lib/uploadContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Image } from "@/components/ui/image";
 import CarouselRow from "@/components/CarouselRow";
 import { Loader2, Play, Pause, ListMusic, Music2 } from "lucide-react";
@@ -14,6 +14,7 @@ export default function Home() {
   const [me, setMe] = useState(null);
   const { playTrack, current, isPlaying, togglePlay } = usePlayer();
   const { refreshKey } = useUpload();
+  const navigate = useNavigate();
 
   const load = async () => {
     setLoading(true);
@@ -54,21 +55,24 @@ export default function Home() {
             const isCurrent = current?.id === p.id;
             const hasAudio = !!p.audio_url;
             return (
-              <button
+              <div
                 key={p.id}
-                onClick={() => hasAudio && playPost(p)}
-                className="glass rounded-2xl overflow-hidden flex items-center gap-3 p-2 pr-3 text-left hover:bg-white/80 transition-colors"
+                onClick={() => navigate(`/post/${p.id}`)}
+                className="glass rounded-2xl overflow-hidden flex items-center gap-3 p-2 pr-3 text-left hover:bg-white/80 transition-colors cursor-pointer"
               >
                 <div className="w-12 h-12 shrink-0 rounded-xl overflow-hidden bg-pink-100">
                   {cover ? <Image src={cover} alt={p.title || ""} className="w-full h-full object-cover" fittingType="fill" /> : <div className="w-full h-full strawberry-gradient" />}
                 </div>
                 <span className="text-xs font-semibold truncate flex-1 leading-tight">{p.title || p.caption || p.type}</span>
                 {hasAudio && (
-                  <span className="w-8 h-8 rounded-full strawberry-gradient text-white flex items-center justify-center shrink-0">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); playPost(p); }}
+                    className="w-8 h-8 rounded-full strawberry-gradient text-white flex items-center justify-center shrink-0"
+                  >
                     {isCurrent && isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
-                  </span>
+                  </button>
                 )}
-              </button>
+              </div>
             );
           })}
         </div>

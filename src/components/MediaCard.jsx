@@ -12,7 +12,6 @@ export default function MediaCard({ post, queue, className }) {
   const isThisPlaying = isCurrent && isPlaying;
   const hasAudio = (post.type === "song" || post.type === "voice") && !!post.audio_url;
   const cover = post.cover_image_url || post.image_url;
-  const openable = post.type === "photo" && !!cover;
 
   const handlePlay = (e) => {
     e.stopPropagation();
@@ -20,13 +19,13 @@ export default function MediaCard({ post, queue, className }) {
     else playTrack(post, queue);
   };
 
-  const open = () => { if (openable) navigate(`/post/${post.id}`); };
+  const open = () => navigate(`/post/${post.id}`);
 
   return (
     <div className={cn("group relative w-40 shrink-0", className)}>
       <div
         onClick={open}
-        className={cn("relative aspect-square rounded-3xl overflow-hidden bg-pink-100/60 backdrop-blur-xl shadow-lg shadow-pink-200/40 ring-1 ring-white/40", openable && "cursor-pointer")}
+        className="relative aspect-square rounded-3xl overflow-hidden bg-pink-100/60 backdrop-blur-xl shadow-lg shadow-pink-200/40 ring-1 ring-white/40 cursor-pointer"
       >
         {cover ? (
           <Image src={cover} alt={post.title || post.caption || ""} className="w-full h-full object-cover" fittingType="fill" />
