@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePlayer } from "@/lib/playerContext";
+import { useUpload } from "@/lib/uploadContext";
 import FeedItem from "@/components/FeedItem";
-import UploadModal from "@/components/UploadModal";
 import { Plus, Loader2, Sparkles } from "lucide-react";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [uploadOpen, setUploadOpen] = useState(false);
   const { playTrack } = usePlayer();
+  const { openUpload, refreshKey } = useUpload();
 
   const load = async () => {
     setLoading(true);
@@ -21,7 +21,7 @@ export default function Home() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [refreshKey]);
 
   const songs = posts.filter((p) => p.type === "song" && p.audio_url);
   const handlePlay = (post) => playTrack(post, songs);
@@ -37,7 +37,7 @@ export default function Home() {
           </h1>
           <p className="text-pink-600/70 mt-1 mb-5">Songs, snaps, and voice notes from your friends.</p>
           <button
-            onClick={() => setUploadOpen(true)}
+            onClick={openUpload}
             className="strawberry-gradient text-white rounded-full px-7 py-3.5 font-semibold text-lg shadow-lg shadow-pink-300/40 hover:opacity-90 active:scale-95 transition-all inline-flex items-center gap-2"
           >
             <Plus className="w-5 h-5" /> Upload
@@ -67,8 +67,6 @@ export default function Home() {
           </div>
         )}
       </section>
-
-      <UploadModal open={uploadOpen} onOpenChange={setUploadOpen} onDone={load} />
     </div>
   );
 }
