@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { MoreHorizontal, ListPlus, ListMusic } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { MoreHorizontal, ListPlus, ListMusic, Pencil, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -12,11 +12,20 @@ import {
 import { base44 } from "@/api/base44Client";
 import { usePlayer } from "@/lib/playerContext";
 import { useToast } from "@/components/ui/use-toast";
+import EditPostDialog from "@/components/EditPostDialog";
 
-export default function SongMoreMenu({ post }) {
+export default function SongMoreMenu({ post, onChanged }) {
   const { addToQueue } = usePlayer();
   const { toast } = useToast();
   const [playlists, setPlaylists] = useState([]);
+  const [isOwner, setIsOwner] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    base44.auth.me().then((me) => { if (active) setIsOwner(me?.id === post.created_by_id); }).catch(() => {});
+    return () => { active = false; };
+  }, [post.created_by_id]);
 
   const loadPlaylists = async (open) => {
     if (!open) return;
@@ -79,7 +88,29 @@ export default function SongMoreMenu({ post }) {
             ))}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
+        {isOwner && (
+          <>
+            <DropdownMenuItem onClick={() => setEditOpen(true)} className="rounded-xl gap-2">
+              <Pencil className="w-4 h-4" /> Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async () => {
+                try {
+                  await base44.entities.Post.delete(post.id);
+                  toast({ title: "Song deleted" });
+                  onChanged?.();
+                } catch (err) {
+                  toast({ title: "Couldn't delete", description: err?.message, variant: "destructive" });
+                }
+              }}
+              className="rounded-xl gap-2 text-destructive focus:text-destructive"
+            >
+              <Trash2 className="w-4 h-4" /> Delete
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
+      {isOwner && <EditPostDialog post={post} open={editOpen} onOpenChange={setEditOpen} onUpdated={onChanged} onDeleted={onChanged} />}
     </DropdownMenu>
   );
 }

@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Image } from "@/components/ui/image";
-import { Play, Pause, Heart, Music2, Mic, ImageIcon, Flame } from "lucide-react";
+import { Play, Pause, Heart, Music2, Mic, ImageIcon, Flame, MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { usePlayer } from "@/lib/playerContext";
 import { cn } from "@/lib/utils";
+import { base44 } from "@/api/base44Client";
 import SongMoreMenu from "@/components/SongMoreMenu";
+import EditPostDialog from "@/components/EditPostDialog";
 
-export default function FeedItem({ post, queue }) {
+export default function FeedItem({ post, queue, onChanged }) {
   const { current, isPlaying, playTrack, togglePlay } = usePlayer();
   const isCurrent = current?.id === post.id;
   const isThisPlaying = isCurrent && isPlaying;
+  const [isOwner, setIsOwner] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    base44.auth.me().then((me) => { if (active) setIsOwner(me?.id === post.created_by_id); }).catch(() => {});
+    return () => { active = false; };
+  }, [post.created_by_id]);
 
   const handlePlay = () => {
     if (isCurrent) togglePlay();
@@ -81,10 +94,27 @@ export default function FeedItem({ post, queue }) {
                 {isThisPlaying ? "Pause" : "Play"}
               </button>
             )}
-            {post.type === "song" && <SongMoreMenu post={post} />}
+            {post.type === "song" && <SongMoreMenu post={post} onChanged={onChanged} />}
+            {isOwner && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="p-2 rounded-full text-pink-500 hover:bg-pink-100/60">
+                    <MoreHorizontal className="w-5 h-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="glass-pink rounded-2xl border-pink-200">
+                  <DropdownMenuItem onClick={() => setEditOpen(true)} className="rounded-xl cursor-pointer">Edit post</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setEditOpen(true)} className="rounded-xl cursor-pointer text-destructive focus:text-destructive">Delete</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>
+
+      {isOwner && (
+        <EditPostDialog post={post} open={editOpen} onOpenChange={setEditOpen} onUpdated={onChanged} onDeleted={onChanged} />
+      )}
     </article>
   );
 }

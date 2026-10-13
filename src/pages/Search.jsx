@@ -124,7 +124,7 @@ export default function Search() {
             <section>
               <h2 className="font-display text-base font-bold text-foreground mb-2 px-1">Songs</h2>
               <div className="space-y-0.5">
-                {rSongs.map((s) => <TrackRow key={s.id} post={s} queue={rSongs} />)}
+                {rSongs.map((s) => <TrackRow key={s.id} post={s} queue={rSongs} onChanged={load} />)}
               </div>
             </section>
           )}
@@ -132,7 +132,7 @@ export default function Search() {
             <section>
               <h2 className="font-display text-base font-bold text-foreground mb-2 px-1">Voice notes</h2>
               <div className="space-y-0.5">
-                {rVoice.map((s) => <TrackRow key={s.id} post={s} queue={rVoice} />)}
+                {rVoice.map((s) => <TrackRow key={s.id} post={s} queue={rVoice} onChanged={load} />)}
               </div>
             </section>
           )}

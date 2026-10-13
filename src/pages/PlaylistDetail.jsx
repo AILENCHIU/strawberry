@@ -113,7 +113,7 @@ export default function PlaylistDetail() {
             <Button onClick={() => setShowAdd(true)} className="strawberry-gradient text-white rounded-full"><Plus className="w-4 h-4 mr-1.5" /> Add songs</Button>
           </div>
         ) : (
-          tracks.map((t) => <TrackRow key={t.id} post={t} queue={tracks} onRemove={removeSong} />)
+          tracks.map((t) => <TrackRow key={t.id} post={t} queue={tracks} onRemove={removeSong} onChanged={load} />)
         )}
       </div>
 

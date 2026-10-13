@@ -12,7 +12,7 @@ function fmt(s) {
   return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 
-export default function TrackRow({ post, queue, onRemove }) {
+export default function TrackRow({ post, queue, onRemove, onChanged }) {
   const { current, isPlaying, playTrack, togglePlay } = usePlayer();
   const isCurrent = current?.id === post.id;
   const isThisPlaying = isCurrent && isPlaying;
@@ -52,7 +52,7 @@ export default function TrackRow({ post, queue, onRemove }) {
             <X className="w-4 h-4" />
           </button>
         )}
-        <SongMoreMenu post={post} />
+        <SongMoreMenu post={post} onChanged={onChanged} />
       </div>
     </div>
   );

@@ -88,7 +88,7 @@ export default function Profile() {
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-4">
-            {posts.map((p) => <FeedItem key={p.id} post={p} queue={songs} />)}
+            {posts.map((p) => <FeedItem key={p.id} post={p} queue={songs} onChanged={load} />)}
           </div>
         )}
       </div>
