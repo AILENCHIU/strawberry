@@ -1,20 +1,40 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
-import { Play, Shuffle, Loader2, ListMusic, ChevronLeft, Plus } from "lucide-react";
+import { Play, Shuffle, Loader2, ListMusic, ChevronLeft, Plus, Camera } from "lucide-react";
 import { usePlayer } from "@/lib/playerContext";
+import { useToast } from "@/components/ui/use-toast";
 import TrackRow from "@/components/TrackRow";
 
 export default function PlaylistDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { playTrack, setShuffle } = usePlayer();
   const [playlist, setPlaylist] = useState(null);
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
+  const [coverBusy, setCoverBusy] = useState(false);
+  const coverInputRef = useRef(null);
+
+  const changeCover = async (e) => {
+    const f = e.target.files?.[0];
+    if (!f || coverBusy) return;
+    setCoverBusy(true);
+    try {
+      const res = await base44.integrations.Core.UploadPublicFile({ file: f });
+      await base44.entities.Playlist.update(id, { cover_image_url: res.file_url });
+      setPlaylist({ ...playlist, cover_image_url: res.file_url });
+      toast({ title: "Cover art updated" });
+    } catch (err) {
+      toast({ title: "Couldn't update cover", description: err?.message, variant: "destructive" });
+    } finally {
+      setCoverBusy(false);
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -65,8 +85,14 @@ export default function PlaylistDetail() {
       </button>
 
       <div className="flex flex-col items-center text-center gap-4">
-        <div className="w-40 h-40 rounded-2xl overflow-hidden strawberry-gradient flex items-center justify-center shadow-xl shadow-pink-300/40">
-          {playlist.cover_image_url ? <Image src={playlist.cover_image_url} alt={playlist.title} className="w-full h-full object-cover" fittingType="fill" /> : <ListMusic className="w-16 h-16 text-white" />}
+        <div className="relative group">
+          <button onClick={() => coverInputRef.current?.click()} className="w-40 h-40 rounded-2xl overflow-hidden strawberry-gradient flex items-center justify-center shadow-xl shadow-pink-300/40">
+            {coverBusy ? <Loader2 className="w-8 h-8 text-white animate-spin" /> : playlist.cover_image_url ? <Image src={playlist.cover_image_url} alt={playlist.title} className="w-full h-full object-cover" fittingType="fill" /> : <ListMusic className="w-16 h-16 text-white" />}
+          </button>
+          <span className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <Camera className="w-7 h-7 text-white" />
+          </span>
+          <input ref={coverInputRef} type="file" accept="image/*" onChange={changeCover} className="hidden" />
         </div>
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-pink-500/70">Playlist</p>

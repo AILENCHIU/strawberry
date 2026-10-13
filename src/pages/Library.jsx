@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 import { Image } from "@/components/ui/image";
@@ -8,17 +8,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { usePlayer } from "@/lib/playerContext";
-import { Plus, ListMusic, Loader2, Search as SearchIcon, Music2, Image as ImageIcon, Play } from "lucide-react";
+import { Plus, ListMusic, Loader2, Search as SearchIcon, Music2, Image as ImageIcon, Play, Upload } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Library() {
+  const { toast } = useToast();
   const [playlists, setPlaylists] = useState([]);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [coverFile, setCoverFile] = useState(null);
+  const [coverPreview, setCoverPreview] = useState(null);
   const [busy, setBusy] = useState(false);
   const [filter, setFilter] = useState("");
+  const coverInputRef = useRef(null);
   const { playTrack, current, isPlaying, togglePlay } = usePlayer();
 
   const load = async () => {
@@ -37,12 +42,26 @@ export default function Library() {
   };
   useEffect(() => { load(); }, []);
 
+  const pickCover = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setCoverFile(f);
+    setCoverPreview(URL.createObjectURL(f));
+  };
+
   const createPlaylist = async () => {
     if (!title.trim() || busy) return;
     setBusy(true);
     try {
-      await base44.entities.Playlist.create({ title: title.trim(), description: description.trim() });
-      setTitle(""); setDescription(""); setCreateOpen(false); load();
+      let cover_image_url = "";
+      if (coverFile) {
+        const res = await base44.integrations.Core.UploadPublicFile({ file: coverFile });
+        cover_image_url = res.file_url;
+      }
+      await base44.entities.Playlist.create({ title: title.trim(), description: description.trim(), cover_image_url: cover_image_url || undefined });
+      setTitle(""); setDescription(""); setCoverFile(null); setCoverPreview(null); setCreateOpen(false); load();
+    } catch (err) {
+      toast({ title: "Couldn't create playlist", description: err?.message, variant: "destructive" });
     } finally {
       setBusy(false);
     }
@@ -141,6 +160,19 @@ export default function Library() {
             <DialogTitle className="font-display text-xl font-bold text-gradient-pink">Create playlist</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            <div className="flex justify-center">
+              <button onClick={() => coverInputRef.current?.click()} className="w-28 h-28 rounded-2xl overflow-hidden strawberry-gradient flex items-center justify-center shadow-lg shadow-pink-300/40 relative group">
+                {coverPreview ? (
+                  <img src={coverPreview} alt="cover" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="flex flex-col items-center gap-1 text-white/90">
+                    <Upload className="w-6 h-6" />
+                    <span className="text-[10px] font-medium">Cover art</span>
+                  </div>
+                )}
+              </button>
+              <input ref={coverInputRef} type="file" accept="image/*" onChange={pickCover} className="hidden" />
+            </div>
             <div className="space-y-2">
               <Label className="text-pink-700 font-medium">Name</Label>
               <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Playlist name" className="rounded-xl bg-white/70 border-pink-200" />
