@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { base44 } from "@/api/base44Client";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Trash2, Flame } from "lucide-react";
+import { Image } from "@/components/ui/image";
+import { Loader2, Trash2, Flame, ImageIcon } from "lucide-react";
 
 export default function EditPostDialog({ post, open, onOpenChange, onUpdated, onDeleted }) {
   const { toast } = useToast();
@@ -16,6 +17,8 @@ export default function EditPostDialog({ post, open, onOpenChange, onUpdated, on
   const [nsfw, setNsfw] = useState(false);
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [coverFile, setCoverFile] = useState(null);
+  const [coverPreview, setCoverPreview] = useState("");
 
   useEffect(() => {
     if (open && post) {
@@ -23,8 +26,17 @@ export default function EditPostDialog({ post, open, onOpenChange, onUpdated, on
       setCaption(post.caption || "");
       setNsfw(!!post.nsfw);
       setConfirmDelete(false);
+      setCoverFile(null);
+      setCoverPreview(post.cover_image_url || post.image_url || "");
     }
   }, [open, post]);
+
+  const pickCover = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCoverFile(file);
+    setCoverPreview(URL.createObjectURL(file));
+  };
 
   if (!post) return null;
 
@@ -34,6 +46,10 @@ export default function EditPostDialog({ post, open, onOpenChange, onUpdated, on
     try {
       const updates = { caption: caption.trim() || undefined, nsfw };
       if (post.type === "song") updates.title = title.trim();
+      if (coverFile) {
+        const res = await base44.integrations.Core.UploadPublicFile({ file: coverFile });
+        updates.cover_image_url = res.file_url;
+      }
       const updated = await base44.entities.Post.update(post.id, updates);
       toast({ title: "Post updated" });
       onUpdated?.(updated);
@@ -72,6 +88,25 @@ export default function EditPostDialog({ post, open, onOpenChange, onUpdated, on
             <div className="space-y-2">
               <Label htmlFor="edit-title" className="text-pink-700 font-medium">Song title</Label>
               <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} className="rounded-xl bg-white/70 border-pink-200" />
+            </div>
+          )}
+
+          {post.type === "song" && (
+            <div className="space-y-2">
+              <Label className="text-pink-700 font-medium">Cover art</Label>
+              <label className="flex items-center gap-4 cursor-pointer">
+                <div className="relative w-24 h-24 rounded-2xl overflow-hidden border border-pink-200 bg-white/50 shrink-0">
+                  {coverPreview ? (
+                    <Image src={coverPreview} alt="cover" className="w-full h-full object-cover" fittingType="fill" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-pink-300">
+                      <ImageIcon className="w-8 h-8" />
+                    </div>
+                  )}
+                </div>
+                <div className="text-sm text-pink-600 font-medium hover:underline">Change cover</div>
+                <input type="file" accept="image/*" onChange={pickCover} className="hidden" />
+              </label>
             </div>
           )}
 
