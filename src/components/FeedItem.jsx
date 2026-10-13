@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Image } from "@/components/ui/image";
-import { Play, Pause, Heart, Music2, Mic, ImageIcon, Flame, MoreHorizontal } from "lucide-react";
+import { Play, Pause, Music2, Mic, ImageIcon, Flame, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import { base44 } from "@/api/base44Client";
 import SongMoreMenu from "@/components/SongMoreMenu";
 import EditPostDialog from "@/components/EditPostDialog";
+import LikeButton from "@/components/LikeButton";
+import CommentSection from "@/components/CommentSection";
 
 export default function FeedItem({ post, queue, onChanged }) {
   const navigate = useNavigate();
@@ -81,10 +83,6 @@ export default function FeedItem({ post, queue, onChanged }) {
             {post.title && <h3 className="font-bold text-lg leading-tight text-foreground truncate">{post.title}</h3>}
             {post.caption && <p className="text-sm text-muted-foreground mt-1 line-clamp-3">{post.caption}</p>}
           </div>
-          <button className="shrink-0 flex flex-col items-center gap-0.5 text-pink-400 hover:text-pink-600 transition-colors">
-            <Heart className="w-5 h-5" />
-            <span className="text-[11px] font-medium">{post.likes || 0}</span>
-          </button>
         </div>
 
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-pink-200/50">
@@ -114,6 +112,11 @@ export default function FeedItem({ post, queue, onChanged }) {
               </DropdownMenu>
             )}
           </div>
+        </div>
+
+        <div className="flex items-center gap-5 mt-3 pt-3 border-t border-pink-200/50">
+          <LikeButton post={post} />
+          <CommentSection post={post} />
         </div>
       </div>
 

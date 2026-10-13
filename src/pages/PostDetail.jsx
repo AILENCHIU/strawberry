@@ -3,8 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Heart, Loader2, Flame, Pencil } from "lucide-react";
+import { ChevronLeft, Loader2, Flame, Pencil } from "lucide-react";
 import EditPostDialog from "@/components/EditPostDialog";
+import LikeButton from "@/components/LikeButton";
+import CommentSection from "@/components/CommentSection";
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -64,10 +66,6 @@ export default function PostDetail() {
             {post.title && <h1 className="font-display text-lg font-bold text-foreground">{post.title}</h1>}
             <button onClick={() => navigate(`/artist/${post.created_by_id}`)} className="text-xs text-pink-600/70 font-medium hover:text-pink-700 hover:underline">by {post.author_name || "strawberry friend"}</button>
           </div>
-          <div className="flex flex-col items-center gap-0.5 text-pink-400">
-            <Heart className="w-5 h-5" />
-            <span className="text-[11px] font-medium">{post.likes || 0}</span>
-          </div>
         </div>
         {post.caption && <p className="text-sm text-muted-foreground whitespace-pre-wrap">{post.caption}</p>}
         {post.nsfw && (
@@ -75,6 +73,10 @@ export default function PostDetail() {
             <Flame className="w-3 h-3" /> 18+
           </span>
         )}
+        <div className="flex items-center gap-5 pt-2 border-t border-pink-200/50">
+          <LikeButton post={post} />
+          <CommentSection post={post} />
+        </div>
       </div>
 
       <EditPostDialog
