@@ -3,23 +3,34 @@ import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Heart, Loader2, Flame } from "lucide-react";
+import { ChevronLeft, Heart, Loader2, Flame, Pencil } from "lucide-react";
+import EditPostDialog from "@/components/EditPostDialog";
 
 export default function PostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isOwner, setIsOwner] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
-  useEffect(() => {
-    let active = true;
+  const load = async () => {
     setLoading(true);
-    base44.entities.Post.get(id)
-      .then((p) => { if (active) setPost(p); })
-      .catch(() => { if (active) setPost(null); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
-  }, [id]);
+    try {
+      const [p, me] = await Promise.all([
+        base44.entities.Post.get(id),
+        base44.auth.me().catch(() => null),
+      ]);
+      setPost(p);
+      setIsOwner(!!me && p?.created_by_id === me.id);
+    } catch {
+      setPost(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, [id]);
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-pink-400" /></div>;
   if (!post) return <p className="text-center text-pink-500/60 py-20">Post not found</p>;
@@ -28,9 +39,16 @@ export default function PostDetail() {
 
   return (
     <div className="min-h-[calc(100vh-2rem)] flex flex-col">
-      <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-pink-600 text-sm font-medium hover:underline mb-3">
-        <ChevronLeft className="w-4 h-4" /> Back
-      </button>
+      <div className="flex items-center justify-between mb-3">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-pink-600 text-sm font-medium hover:underline">
+          <ChevronLeft className="w-4 h-4" /> Back
+        </button>
+        {isOwner && (
+          <Button onClick={() => setEditOpen(true)} variant="ghost" size="sm" className="text-pink-600 hover:bg-pink-100/60 rounded-full">
+            <Pencil className="w-4 h-4 mr-1" /> Edit
+          </Button>
+        )}
+      </div>
 
       <div className="flex-1 flex items-center justify-center">
         {img ? (
@@ -58,6 +76,14 @@ export default function PostDetail() {
           </span>
         )}
       </div>
+
+      <EditPostDialog
+        post={post}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        onUpdated={(updated) => setPost(updated)}
+        onDeleted={() => navigate(-1)}
+      />
     </div>
   );
 }
