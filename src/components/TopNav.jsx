@@ -20,12 +20,11 @@ export default function TopNav() {
     { to: "/library", label: "Library", icon: Library },
   ];
 
-  const renderTab = ({ to, label, icon: Icon }) => {
+  const renderTab = ({ to, icon: Icon }) => {
     const active = location.pathname === to;
     return (
-      <Link key={to} to={to} className="flex flex-col items-center justify-center gap-0.5 px-2.5 py-1.5 min-w-0">
+      <Link key={to} to={to} className="flex items-center justify-center px-2.5 py-1.5 min-w-0">
         <Icon className={cn("w-5 h-5 transition-colors", active ? "text-pink-600" : "text-pink-400/70")} strokeWidth={active ? 2.5 : 2} />
-        <span className={cn("text-[10px] font-medium transition-colors", active ? "text-pink-600" : "text-pink-400/70")}>{label}</span>
       </Link>
     );
   };
@@ -38,11 +37,10 @@ export default function TopNav() {
         <div className="flex items-center justify-center flex-1">
           {renderTab(tabs[0])}
           {renderTab(tabs[1])}
-          <button onClick={openUpload} className="flex flex-col items-center justify-center gap-0.5 px-2.5 py-1.5 min-w-0" aria-label="Upload">
+          <button onClick={openUpload} className="flex items-center justify-center px-2.5 py-1.5 min-w-0" aria-label="Upload">
             <span className="w-8 h-8 rounded-full strawberry-gradient text-white flex items-center justify-center shadow-md shadow-pink-300/50">
               <Plus className="w-4 h-4" />
             </span>
-            <span className="text-[10px] font-medium text-pink-500/70">Upload</span>
           </button>
           {renderTab(tabs[2])}
         </div>
