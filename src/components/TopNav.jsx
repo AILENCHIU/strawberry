@@ -20,11 +20,11 @@ export default function TopNav() {
     { to: "/library", label: "Library", icon: Library },
   ];
 
-  const renderTab = ({ to, icon: Icon }) => {
+  const renderTab = ({ to, icon: Icon, size = "w-5 h-5" }) => {
     const active = location.pathname === to;
     return (
       <Link key={to} to={to} className="flex items-center justify-center px-2.5 py-1.5 min-w-0">
-        <Icon className={cn("w-5 h-5 transition-colors", active ? "text-pink-600" : "text-pink-400/70")} strokeWidth={active ? 2.5 : 2} />
+        <Icon className={cn(`${size} transition-colors`, active ? "text-pink-600" : "text-pink-400/70")} strokeWidth={active ? 2.5 : 2} />
       </Link>
     );
   };
@@ -42,7 +42,7 @@ export default function TopNav() {
               <Plus className="w-4 h-4" />
             </span>
           </button>
-          {renderTab({ to: "/messages", icon: Send })}
+          {renderTab({ to: "/messages", icon: Send, size: "w-[18px] h-[18px]" })}
           {renderTab(tabs[2])}
         </div>
 
