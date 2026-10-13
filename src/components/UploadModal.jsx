@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -146,13 +146,8 @@ export default function UploadModal({ open, onOpenChange, onDone }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass rounded-3xl max-w-lg p-0 max-h-[88vh] overflow-y-auto">
-        <DialogHeader className="px-6 pt-6">
-          <DialogTitle className="font-display text-2xl font-bold text-gradient-pink">Share to Strawberry</DialogTitle>
-          <DialogDescription className="text-pink-600/70">Drop a song, a photo, or a voice note.</DialogDescription>
-        </DialogHeader>
-
-        <div className="px-6 pb-6 space-y-5">
+      <DialogContent className="glass-pink rounded-3xl max-w-lg p-0 max-h-[88vh] overflow-y-auto">
+        <div className="px-6 pt-6 pb-6 space-y-5">
           <Tabs value={type} onValueChange={setType}>
             <TabsList className="grid grid-cols-3 w-full bg-pink-100/50 rounded-2xl">
               <TabsTrigger value="song" className="rounded-2xl data-[state=active]:strawberry-gradient data-[state=active]:text-white">
