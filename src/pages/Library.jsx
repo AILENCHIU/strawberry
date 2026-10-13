@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { usePlayer } from "@/lib/playerContext";
-import { Plus, ListMusic, Loader2, Search as SearchIcon, Music2, Image as ImageIcon, Play, Upload } from "lucide-react";
+import { Plus, ListMusic, Loader2, Search as SearchIcon, Music2, Image as ImageIcon, Play, Pause, Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function Library() {
@@ -25,6 +25,7 @@ export default function Library() {
   const [filter, setFilter] = useState("");
   const coverInputRef = useRef(null);
   const { playTrack, current, isPlaying, togglePlay } = usePlayer();
+  const navigate = useNavigate();
 
   const load = async () => {
     setLoading(true);
@@ -106,7 +107,7 @@ export default function Library() {
             const active = current?.id === p.id;
             const cover = p.cover_image_url || p.image_url;
             return (
-              <button key={p.id} onClick={() => playPost(p)} className="w-full flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-pink-100/50 transition-colors text-left">
+              <div key={p.id} onClick={() => navigate(`/post/${p.id}`)} className="w-full flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-pink-100/50 transition-colors text-left cursor-pointer">
                 <div className="w-14 h-14 rounded-xl overflow-hidden strawberry-gradient flex items-center justify-center shrink-0 shadow-sm relative">
                   {cover ? <img src={cover} alt={p.title || "upload"} className="w-full h-full object-cover" /> : p.type === "photo" ? <ImageIcon className="w-6 h-6 text-white" /> : <Music2 className="w-6 h-6 text-white" />}
                   <span className={`absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity ${active && isPlaying ? "opacity-100" : "opacity-0"}`}>
@@ -117,7 +118,15 @@ export default function Library() {
                   <p className={`font-semibold text-sm truncate ${active ? "text-pink-600" : "text-foreground"}`}>{p.title || p.caption || "Untitled"}</p>
                   <p className="text-xs text-pink-500/70 truncate capitalize">{p.type} • {p.author_name || "you"}</p>
                 </div>
-              </button>
+                {p.audio_url && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); playPost(p); }}
+                    className="w-9 h-9 rounded-full strawberry-gradient text-white flex items-center justify-center shrink-0 shadow-md shadow-pink-300/40"
+                  >
+                    {active && isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                  </button>
+                )}
+              </div>
             );
           })}
         </div>
